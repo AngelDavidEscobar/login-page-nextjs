@@ -1,15 +1,11 @@
-'use server';
+"use client"
+import { SessionProvider } from "next-auth/react"
+import MainPage from "./main"
 
-import LogoutButton from "../components/LogoutButton";
-
-
-
-export default async function MainPage() {
-    
+export default function Main() {
   return (
-    <div>
-      <h1>Bienvenido a Aportes Linea</h1>
-      <LogoutButton />
-    </div>
-  );
+    <SessionProvider>
+      <MainPage />
+    </SessionProvider>
+    )
 }
