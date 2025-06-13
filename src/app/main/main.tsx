@@ -8,11 +8,12 @@ import {
   UserPlus,
   FileSpreadsheet,
   Settings,
-  LogOut,
   User,
   Loader2,
   AlertCircle,
 } from "lucide-react"
+import AdminModule from "../components/AdminModule"
+import LogoutButton from "../components/LogoutButton"
 
 // Tipos de documento disponibles
 const documentTypes = [
@@ -38,7 +39,6 @@ interface UserData {
 export default function MainPage() {
   const { data: session } = useSession()
   const [activeTab, setActiveTab] = useState("individual")
-  const [showCreateUser, setShowCreateUser] = useState(false)
 
   // Estados para consulta individual
   const [individualForm, setIndividualForm] = useState({
@@ -59,7 +59,7 @@ export default function MainPage() {
   const [masiveError, setMasiveError] = useState("")
   const [selectedUsers, setSelectedUsers] = useState<string[]>([])
 
-  // Mock: verificar si el usuario es administrador
+  // Verificar si el usuario es administrador
   const isAdmin = session?.user?.role === "admin"
 
   // Función para consulta individual
@@ -90,7 +90,7 @@ export default function MainPage() {
       const userData = await response.json()
       setIndividualResult(userData)
     } catch (error) {
-      console.log(error)
+      
       setTimeout(() => {
         const mockUser: UserData = {
           id: "1",
@@ -149,7 +149,7 @@ export default function MainPage() {
       const usersData = await response.json()
       setMasiveResults(usersData)
     } catch (error) {
-      console.log(error)
+      // Mock data para demostración
       setTimeout(() => {
         const mockUsers: UserData[] = [
           {
@@ -210,7 +210,6 @@ export default function MainPage() {
       window.URL.revokeObjectURL(url)
       document.body.removeChild(a)
     } catch (error) {
-      console.log(error)
       // Mock download para demostración
       alert(`Descargando archivo: ${filename}.xlsx con ${users.length} registros`)
     }
@@ -226,7 +225,7 @@ export default function MainPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+     
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
@@ -245,18 +244,16 @@ export default function MainPage() {
               <button className="p-2 text-gray-400 hover:text-purple-600 transition-colors">
                 <Settings className="w-5 h-5" />
               </button>
-              <button className="p-2 text-gray-400 hover:text-red-500 transition-colors">
-                <LogOut className="w-5 h-5" />
-              </button>
+              <LogoutButton />
             </div>
           </div>
         </div>
       </header>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Main Content */}
+   
         <div className="bg-white rounded-xl shadow-sm border border-gray-100">
-          {/* Tabs */}
+       
           <div className="border-b border-gray-200">
             <nav className="flex space-x-8 px-6">
               <button
@@ -305,9 +302,9 @@ export default function MainPage() {
             </nav>
           </div>
 
-          {/* Content */}
+          
           <div className="p-6">
-            {/* Individual Tab */}
+            
             {activeTab === "individual" && (
               <div className="space-y-6">
                 <div>
@@ -317,7 +314,7 @@ export default function MainPage() {
                   </p>
                 </div>
 
-                {/* Formulario Individual */}
+                
                 <div className="bg-gray-50 rounded-lg p-6">
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <div>
@@ -376,7 +373,7 @@ export default function MainPage() {
                   )}
                 </div>
 
-                {/* Resultado Individual */}
+              
                 {individualResult && (
                   <div className="bg-white border border-gray-200 rounded-lg p-6">
                     <div className="flex justify-between items-center mb-4">
@@ -428,7 +425,7 @@ export default function MainPage() {
               </div>
             )}
 
-            {/* Masiva Tab */}
+            
             {activeTab === "masiva" && (
               <div className="space-y-6">
                 <div>
@@ -590,83 +587,8 @@ export default function MainPage() {
               </div>
             )}
 
-            {/* Admin Tab */}
-            {activeTab === "admin" && isAdmin && (
-              <div className="space-y-6">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium text-gray-900">Administración de Usuarios</h3>
-                  <button
-                    onClick={() => setShowCreateUser(!showCreateUser)}
-                    className="flex items-center space-x-2 px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors"
-                  >
-                    <UserPlus className="w-4 h-4" />
-                    <span>Crear Usuario</span>
-                  </button>
-                </div>
-
-                {showCreateUser && (
-                  <div className="bg-gray-50 rounded-lg p-6">
-                    <h4 className="text-md font-medium text-gray-900 mb-4">Nuevo Usuario</h4>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Nombre Completo</label>
-                        <input
-                          type="text"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                          placeholder="Dr. Juan Pérez"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Email</label>
-                        <input
-                          type="email"
-                          className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
-                          placeholder="juan.perez@clinica.com"
-                        />
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Rol</label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                          <option>Médico</option>
-                          <option>Enfermera</option>
-                          <option>Administrador</option>
-                        </select>
-                      </div>
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Departamento</label>
-                        <select className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500">
-                          <option>Cardiología</option>
-                          <option>Neurología</option>
-                          <option>Urgencias</option>
-                          <option>IT</option>
-                        </select>
-                      </div>
-                    </div>
-                    <div className="flex justify-end space-x-3 mt-6">
-                      <button
-                        onClick={() => setShowCreateUser(false)}
-                        className="px-4 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
-                      >
-                        Cancelar
-                      </button>
-                      <button className="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition-colors">
-                        Crear Usuario
-                      </button>
-                    </div>
-                  </div>
-                )}
-
-                <div className="bg-orange-50 border border-orange-200 rounded-lg p-4">
-                  <div className="flex items-center space-x-2">
-                    <Settings className="w-5 h-5 text-orange-600" />
-                    <p className="text-sm text-orange-800">
-                      <strong>Módulo de Administración:</strong> Solo usuarios con rol de administrador pueden acceder a
-                      esta sección.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            )}
+           
+            {activeTab === "admin" && <AdminModule isAdmin={isAdmin} />}
           </div>
         </div>
       </div>
