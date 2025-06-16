@@ -14,6 +14,10 @@ import {
 } from "lucide-react"
 import AdminModule from "../components/AdminModule"
 import LogoutButton from "../components/LogoutButton"
+import usePersona from "../hooks/usePersona"
+import { Persona } from "../../../types/api"
+import ExcelDownloader from "../components/ExcelDownloaader"
+
 
 // Tipos de documento disponibles
 const documentTypes = [
@@ -45,9 +49,10 @@ export default function MainPage() {
     documentType: "",
     documentNumber: "",
   })
-  const [individualResult, setIndividualResult] = useState<UserData | null>(null)
-  const [individualLoading, setIndividualLoading] = useState(false)
-  const [individualError, setIndividualError] = useState("")
+
+ 
+  const [individualError, setIndividualError] = useState("");
+  const { persona, loading: personaLoading, error: personaError, buscarPersona } = usePersona();
 
   // Estados para consulta masiva
   const [masiveForm, setMasiveForm] = useState({
@@ -69,47 +74,12 @@ export default function MainPage() {
       return
     }
 
-    setIndividualLoading(true)
     setIndividualError("")
-    setIndividualResult(null)
-
-    try {
-      // Aquí harías la llamada real a tu API
-      const response = await fetch("/api/users/individual", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(individualForm),
-      })
-
-      if (!response.ok) {
-        throw new Error("Usuario no encontrado")
-      }
-
-      const userData = await response.json()
-      setIndividualResult(userData)
-    } catch (error) {
-      
-      setTimeout(() => {
-        const mockUser: UserData = {
-          id: "1",
-          documentType: individualForm.documentType,
-          documentNumber: individualForm.documentNumber,
-          name: "Juan Carlos Pérez",
-          email: "juan.perez@email.com",
-          phone: "+57 300 123 4567",
-          address: "Calle 123 #45-67, Bogotá",
-          birthDate: "1985-03-15",
-          status: "Activo",
-        }
-        setIndividualResult(mockUser)
-        setIndividualLoading(false)
-      }, 1500)
-      return
-    }
-
-    setIndividualLoading(false)
+  
+    await buscarPersona(individualForm.documentType, individualForm.documentNumber)
+    
+ 
+  
   }
 
   // Función para consulta masiva
@@ -185,34 +155,8 @@ export default function MainPage() {
   }
 
   // Función para descargar Excel
-  const handleDownloadExcel = async (users: UserData[], filename: string) => {
-    try {
-      const response = await fetch("/api/export/excel", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ users }),
-      })
-
-      if (!response.ok) {
-        throw new Error("Error al generar el archivo Excel")
-      }
-
-      const blob = await response.blob()
-      const url = window.URL.createObjectURL(blob)
-      const a = document.createElement("a")
-      a.style.display = "none"
-      a.href = url
-      a.download = `${filename}.xlsx`
-      document.body.appendChild(a)
-      a.click()
-      window.URL.revokeObjectURL(url)
-      document.body.removeChild(a)
-    } catch (error) {
-      // Mock download para demostración
-      alert(`Descargando archivo: ${filename}.xlsx con ${users.length} registros`)
-    }
+  const handleDownloadExcel = async ({personas}: {personas: Persona[]}) => {
+    
   }
 
   const handleSelectUser = (userId: string) => {
@@ -322,7 +266,7 @@ export default function MainPage() {
                       <select
                         value={individualForm.documentType}
                         onChange={(e) => setIndividualForm({ ...individualForm, documentType: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                       >
                         <option value="">Seleccione...</option>
                         {documentTypes.map((type) => (
@@ -340,17 +284,17 @@ export default function MainPage() {
                         value={individualForm.documentNumber}
                         onChange={(e) => setIndividualForm({ ...individualForm, documentNumber: e.target.value })}
                         placeholder="Ingrese el número"
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                       />
                     </div>
 
                     <div className="flex items-end">
                       <button
                         onClick={handleIndividualSearch}
-                        disabled={individualLoading}
+                        disabled={personaLoading}
                         className="w-full flex items-center justify-center px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                       >
-                        {individualLoading ? (
+                        {personaLoading ? (
                           <>
                             <Loader2 className="animate-spin w-4 h-4 mr-2" />
                             Consultando...
@@ -371,56 +315,46 @@ export default function MainPage() {
                       <p className="text-sm text-red-700">{individualError}</p>
                     </div>
                   )}
+                  {personaError && (
+                    <div className="mt-4 p-3 bg-red-50 border border-red-200 rounded-lg flex items-center space-x-2">
+                      <AlertCircle className="w-4 h-4 text-red-500" />
+                      <p className="text-sm text-red-700">{personaError}</p>
+                    </div>
+                  )}
                 </div>
 
               
-                {individualResult && (
-                  <div className="bg-white border border-gray-200 rounded-lg p-6">
-                    <div className="flex justify-between items-center mb-4">
-                      <h4 className="text-md font-medium text-gray-900">Resultado de la Consulta</h4>
-                      <button
-                        onClick={() =>
-                          handleDownloadExcel(
-                            [individualResult],
-                            `consulta_individual_${individualResult.documentNumber}`,
-                          )
-                        }
-                        className="flex items-center space-x-2 px-4 py-2 bg-purple-600 text-white rounded-lg hover:bg-purple-700 transition-colors"
-                      >
-                        <Download className="w-4 h-4" />
-                        <span>Descargar Excel</span>
-                      </button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Nombre Completo</p>
-                        <p className="text-sm text-gray-900">{individualResult.name}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Documento</p>
-                        <p className="text-sm text-gray-900">
-                          {individualResult.documentType} {individualResult.documentNumber}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Email</p>
-                        <p className="text-sm text-gray-900">{individualResult.email}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Teléfono</p>
-                        <p className="text-sm text-gray-900">{individualResult.phone}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Dirección</p>
-                        <p className="text-sm text-gray-900">{individualResult.address}</p>
-                      </div>
-                      <div>
-                        <p className="text-sm font-medium text-gray-500">Fecha de Nacimiento</p>
-                        <p className="text-sm text-gray-900">{individualResult.birthDate}</p>
-                      </div>
-                    </div>
+                
+                {persona && (
+                 <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                        <h5 className="text-sm font-semibold text-gray-700 border-b border-gray-200 pb-2 mb-4">
+                          Resumen de Información Personal
+                        </h5>
+                        {persona.data?.[0] && (
+                                <ExcelDownloader personas={persona.data?.[0]}/>
+                                )}
                   </div>
+                        
+                        <div className="space-y-3">
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Nombre Completo</p>
+                            <p className="text-sm text-gray-900">{persona.data?.[0]?.PrimerNombre} {persona.data?.[0]?.SegundoNombre} {persona.data?.[0]?.PrimerApellido} {persona.data?.[0]?.SegundoApellido}</p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">Documento</p>
+                            <p className="text-sm text-gray-900">
+                              {persona.data?.[0]?.TipoDocumento} {persona.data?.[0]?.NumeroDocumento}
+                            </p>
+                          </div>
+                          <div>
+                            <p className="text-sm font-medium text-gray-500">EPS</p>
+                            <p className="text-sm text-gray-900">
+                              {persona.data?.[0]?.NombreEps} 
+                            </p>
+                          </div>
+                        </div>
+                  </div> 
                 )}
               </div>
             )}
@@ -435,7 +369,7 @@ export default function MainPage() {
                   </p>
                 </div>
 
-                {/* Formulario Masivo */}
+                
                 <div className="bg-gray-50 rounded-lg p-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -443,7 +377,7 @@ export default function MainPage() {
                       <select
                         value={masiveForm.documentType}
                         onChange={(e) => setMasiveForm({ ...masiveForm, documentType: e.target.value })}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent text-gray-900"
                       >
                         <option value="">Seleccione...</option>
                         {documentTypes.map((type) => (
@@ -463,7 +397,7 @@ export default function MainPage() {
                         onChange={(e) => setMasiveForm({ ...masiveForm, documentNumbers: e.target.value })}
                         placeholder={`12345678\n87654321\n11223344`}
                         rows={4}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent resize-none text-gray-900"
                       />
                     </div>
                   </div>
@@ -535,7 +469,7 @@ export default function MainPage() {
                                 type="checkbox"
                                 checked={selectedUsers.length === masiveResults.length && masiveResults.length > 0}
                                 onChange={handleSelectAll}
-                                className="h-4 w-4 text-purple-600 focus:ring-purple-500 border-gray-300 rounded"
+                                className="h-4 w-4 text-gray-900 focus:ring-purple-500 border-gray-300 rounded text-gray-900z"
                               />
                             </th>
                             <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
