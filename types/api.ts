@@ -19,7 +19,7 @@ export interface PersonaRequestBody {
   }[];
 }
 export interface Mensaje {
-  Tipo: 'Error' | 'Advertencia' | 'Información'; // Ajusta los posibles tipos según necesites
+  Tipo: 'Error' | 'Advertencia' | 'Información'; 
   Codigo: number;
   Texto: string;
   ListaMensaje: null | any[]; 

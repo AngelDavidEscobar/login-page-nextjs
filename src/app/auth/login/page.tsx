@@ -2,7 +2,7 @@
 import { signIn } from "next-auth/react"
 import { useState, type FormEvent } from "react"
 import { useRouter } from "next/navigation"
-import { Eye, EyeOff, Mail, Lock, Loader2, Heart, Shield, Stethoscope } from "lucide-react"
+import { Eye, EyeOff, Mail, Lock, Loader2, Heart, Shield, Stethoscope, FileDown, Webhook, FileStack } from "lucide-react"
 
 export default function LoginPage() {
   const [email, setEmail] = useState("")
@@ -40,32 +40,33 @@ export default function LoginPage() {
         <div className="relative z-10 flex flex-col justify-center items-center text-white p-12">
           <div className="mb-8">
             <div className="w-20 h-20 bg-white/20 rounded-full flex items-center justify-center mb-6 backdrop-blur-sm">
-              <Stethoscope className="w-10 h-10 text-white" />
+              <Webhook className="w-10 h-10 text-white" />
             </div>
-            <h1 className="text-4xl font-bold mb-4">Nombre to Bonito</h1>
+            <h1 className="text-4xl font-bold mb-4">Thais</h1>
             <p className="text-xl text-purple-100 text-center max-w-md">
-              Sistema integral de gestión de ....
+              Sistema integral de gestión de Consulta
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-6 max-w-sm">
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                <Shield className="w-5 h-5 text-white" />
+                <FileDown className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold">Seguridad Garantizada</h3>
-                <p className="text-sm text-purple-100">insertar texto</p>
+                <h3 className="font-semibold">Descarga de archivos</h3>
+                <p className="text-sm text-purple-100">Descargue los registros en formato Excel</p>
               </div>
             </div>
 
             <div className="flex items-center space-x-3">
               <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
-                <Heart className="w-5 h-5 text-white" />
+                <FileStack className="w-5 h-5 text-white" />
               </div>
               <div>
-                <h3 className="font-semibold">Cuidado Integral</h3>
-                <p className="text-sm text-purple-100">Insertar texto</p>
+                <h3 className="font-semibold">Consulta Masiva</h3>
+                <p className="text-sm text-purple-100">Consulte múltiples usuarios de forma masiva</p>
+             
               </div>
             </div>
           </div>
@@ -118,7 +119,7 @@ export default function LoginPage() {
             
               <div>
                 <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Correo Institucional
+                  Correo 
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -139,7 +140,7 @@ export default function LoginPage() {
             
               <div>
                 <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
-                  Contraseña Segura
+                  Contraseña 
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
@@ -175,9 +176,9 @@ export default function LoginPage() {
                  
                 </div>
                 <div className="text-sm">
-                  <a href="#" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
+                 {/*  <a href="#" className="font-medium text-purple-600 hover:text-purple-500 transition-colors">
                     ¿Olvidó su contraseña?
-                  </a>
+                  </a> */}
                 </div>
               </div>
 
@@ -200,20 +201,20 @@ export default function LoginPage() {
 
         
             <div className="mt-8 p-4 bg-gray-50 rounded-xl">
-              <div className="flex items-center space-x-2">
+              {/* <div className="flex items-center space-x-2">
                 <Shield className="h-4 w-4 text-purple-600" />
                 <p className="text-xs text-gray-600">
                   <strong>Aviso de Seguridad:</strong> Cuando haga falta ejemplo: mantenimiento
                 </p>
-              </div>
+              </div> */}
             </div>
           </div>
 
           
           <div className="text-center mt-8">
-            <p className="text-sm text-gray-500">
-              Descripcion pendiente tal vez la quite
-            </p>
+           {/*  <p className="text-sm text-gray-500">
+              Zentria 2025
+            </p> */}
           </div>
         </div>
       </div>

@@ -5,7 +5,7 @@ import { Workbook } from "exceljs";
 export async function POST(req: NextRequest) {
   try {
     const persona = await req.json();
-    console.log("BODY COMPLETO:", persona);
+    
 
     const workbook = new Workbook();
     const worksheet = workbook.addWorksheet("Persona");
